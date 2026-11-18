@@ -100,7 +100,7 @@ async function graphql<T>(query: string, variables: Record<string, unknown> = {}
 // GitHub search only matches whole words, so each repo's PRs are kept in a local index and searched here.
 // The first sync pages through every PR; later syncs stop at the first PR not updated since the last one.
 
-const CACHE_DIR = join(homedir(), ".cache", "opencode-gh-pr")
+const CACHE_DIR = join(homedir(), ".cache", "opencode-gh-pr-search")
 const RESYNC_MS = 60_000
 
 // Bump when the stored fields change, so old caches are fetched again in full.

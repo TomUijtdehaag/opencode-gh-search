@@ -6,7 +6,7 @@ An [OpenCode](https://opencode.ai) Desktop plugin that adds `/pr`: a live search
 - **Multiple repos.** Run it from a folder that holds several repos and it searches all of them, or narrow with a short repo name: `/pr api login` searches `acme-api` only.
 - **Sorted** open → draft → merged → closed, newest first, with GitHub's state labels.
 - **Stacks.** Open PRs based on another open PR's branch show their position, e.g. `2/3`.
-- **Fast.** Each repo's PRs are kept in a local index (`~/.cache/opencode-gh-pr/`) that updates incrementally in the background, so searching takes milliseconds.
+- **Fast.** Each repo's PRs are kept in a local index (`~/.cache/opencode-gh-pr-search/`) that updates incrementally in the background, so searching takes milliseconds.
 
 ## Requirements
 
