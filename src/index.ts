@@ -69,8 +69,19 @@ async function lookupName(dir: string): Promise<string> {
 
 let token: string | undefined
 
+/** `gh` is missing or not logged in. Not specific to a repo, so it's shown once instead of per repo. */
+class GhUnavailable extends Error {}
+
 async function githubToken(): Promise<string> {
-  if (!token) token = (await run("gh", ["auth", "token"], { env })).stdout.trim()
+  if (token) return token
+  try {
+    token = (await run("gh", ["auth", "token"], { env })).stdout.trim()
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT")
+      throw new GhUnavailable("GitHub CLI not found. Install gh from https://cli.github.com, then run `gh auth login`.")
+    throw new GhUnavailable("Not logged in to the GitHub CLI. Run `gh auth login`.")
+  }
+  if (!token) throw new GhUnavailable("Not logged in to the GitHub CLI. Run `gh auth login`.")
   return token
 }
 
@@ -374,6 +385,10 @@ function refresh(kind: Kind, repo: string) {
         return
       }
       nextSync.set(k, Date.now() + RETRY_MS)
+      if (error instanceof GhUnavailable) {
+        syncErrors.set(k, error.message)
+        return
+      }
       syncErrors.set(k, `Indexing ${repo} failed: ${error instanceof Error ? error.message : String(error)}`)
     })
     .finally(() => syncing.delete(k))
@@ -458,7 +473,7 @@ async function search(kind: Kind, dirs: string[], query: string, size: number, s
   const offset = start?.offset ?? 0
   const items = all.slice(offset, offset + size).map(withoutIgnored)
   const indexing = repos.some((repo) => syncing.has(key(kind, repo)))
-  const errors = repos.map((repo) => syncErrors.get(key(kind, repo))).filter((e): e is string => !!e)
+  const errors = [...new Set(repos.map((repo) => syncErrors.get(key(kind, repo))).filter((e): e is string => !!e))]
   const result: Page = { repos, items, total: all.length, indexing, viewer: me }
   if (errors.length) result.error = errors.join("; ")
   if (offset + size < all.length) result.next = { offset: offset + size }
