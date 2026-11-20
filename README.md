@@ -15,19 +15,37 @@ In the TUI, the picked item's URL is typed into the prompt: TUI plugins can't ad
 
 - OpenCode Desktop or CLI 2.2 or later (the GUI plugin API is experimental and may change)
 - [`gh`](https://cli.github.com) logged in (`gh auth login`); the plugin uses its token
+
 ## Install
 
 ```sh
 opencode plugin add opencode-gh-search
 ```
 
-This adds it to your global config, which Desktop needs to load plugin UIs. To stay on a stable version instead of following updates, pin it (exact versions are never auto-updated):
+This adds it to your global `~/.config/opencode/opencode.json`, which Desktop needs to load plugin UIs. Unpinned, OpenCode keeps it up to date. To stay on a stable version, pin it; exact versions are never auto-updated:
 
 ```sh
 opencode plugin add opencode-gh-search@0.1.0
 ```
 
-Check for and apply updates with `opencode plugin check` and `opencode plugin update opencode-gh-search`.
+Check for and apply updates with `opencode plugin check` and `opencode plugin update opencode-gh-search`. Remove it with `opencode plugin remove opencode-gh-search`.
+
+### Let your agent install it
+
+Paste this into OpenCode:
+
+```text
+Install the OpenCode plugin opencode-gh-search (https://github.com/TomUijtdehaag/opencode-gh-search):
+1. Check `gh auth status`. If not logged in, ask me to run `gh auth login`; don't run it yourself.
+2. Run `opencode plugin add opencode-gh-search`. It must go in the global config so Desktop loads its UI.
+3. Confirm with `opencode plugin list`, then tell me to try `/pr` and `/issue`.
+```
+
+Steps for agents doing this unprompted:
+
+1. Requires `gh` logged in (`gh auth status`). Leave `gh auth login` to the user, since it's interactive.
+2. Install with `opencode plugin add opencode-gh-search` (or `@<version>` to pin). Don't hand-edit the config unless the CLI is unavailable. In that case, add `"opencode-gh-search"` to `plugins` in the global `~/.config/opencode/opencode.json` and keep the other entries.
+3. Config changes load automatically, so no restart is needed. Verify with `opencode plugin list`.
 
 ### From source
 
@@ -48,17 +66,6 @@ Add the folder to your global `~/.config/opencode/opencode.json`:
 }
 ```
 
-## Release
-
-Versions follow [semver](https://semver.org) and are immutable once published. To release:
-
-```sh
-npm version patch   # or minor / major: bumps package.json, commits, and tags v<version>
-git push --follow-tags
-```
-
-The tag triggers `.github/workflows/publish.yml`, which typechecks, builds, publishes to npm with provenance through [trusted publishing](https://docs.npmjs.com/trusted-publishers) (no npm token), and creates the GitHub release.
-
 ## Settings
 
 Pass options through the plugin entry:
@@ -67,7 +74,7 @@ Pass options through the plugin entry:
 {
   "plugins": [
     {
-      "package": "/absolute/path/to/opencode-gh-search",
+      "package": "opencode-gh-search",
       "options": {
         // Leave bot reviews (e.g. Copilot) out of the review status. Default true.
         "ignoreBotReviews": true,
@@ -104,6 +111,17 @@ Arrow keys to select, Enter to attach, scroll for more. The attachment gives the
 | `src/tui.tsx` | terminal UI | dialog and prompt insert |
 
 [SPEC.md](SPEC.md) describes the behaviour both UIs must share. Run `npm run dev` to rebuild the GUI on change; Desktop reloads it automatically. The server reloads `src/index.ts` on change but not the files it imports: after changing `src/rpc.ts`, run `opencode service restart`.
+
+### Release
+
+Versions follow [semver](https://semver.org) and are immutable once published. To release:
+
+```sh
+npm version patch   # or minor / major: bumps package.json, commits, and tags v<version>
+git push --follow-tags
+```
+
+The tag triggers `.github/workflows/publish.yml`, which typechecks, builds, publishes to npm with provenance through [trusted publishing](https://docs.npmjs.com/trusted-publishers) (no npm token), and creates the GitHub release.
 
 ## License
 

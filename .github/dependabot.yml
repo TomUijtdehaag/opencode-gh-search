@@ -1,10 +1,8 @@
 version: 2
 updates:
+  # Only the pinned workflow actions. @opencode/plugin is a caret range that installs resolve, and the
+  # rest are build tools.
   - package-ecosystem: github-actions
-    directory: /
-    schedule:
-      interval: weekly
-  - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
