@@ -1,5 +1,18 @@
 # opencode-gh-search
 
+<details>
+<summary><b>Instructions for agents</b></summary>
+
+To install this plugin for the user:
+
+1. Requires `gh` logged in (`gh auth status`). Leave `gh auth login` to the user, since it's interactive.
+2. Install with `opencode plugin add opencode-gh-search` (or `@<version>` to pin). Don't hand-edit the config unless the CLI is unavailable. In that case, add `"opencode-gh-search"` to `plugins` in the global `~/.config/opencode/opencode.json` and keep the other entries.
+3. Config changes load automatically, so no restart is needed. Verify with `opencode plugin list`.
+
+Then tell the user to try `/pr` and `/issue`. Usage and options are described below.
+
+</details>
+
 An [OpenCode](https://opencode.ai) plugin for Desktop and the TUI that adds live search for GitHub pull requests (`/pr`) and issues (`/issue`). Pick one and it is attached to your prompt as context.
 
 In the TUI, the picked item's URL is typed into the prompt: TUI plugins can't add attachment chips yet. If the prompt can't be reached, it is copied to the clipboard instead.
@@ -41,11 +54,7 @@ Install the OpenCode plugin opencode-gh-search (https://github.com/TomUijtdehaag
 3. Confirm with `opencode plugin list`, then tell me to try `/pr` and `/issue`.
 ```
 
-Steps for agents doing this unprompted:
-
-1. Requires `gh` logged in (`gh auth status`). Leave `gh auth login` to the user, since it's interactive.
-2. Install with `opencode plugin add opencode-gh-search` (or `@<version>` to pin). Don't hand-edit the config unless the CLI is unavailable. In that case, add `"opencode-gh-search"` to `plugins` in the global `~/.config/opencode/opencode.json` and keep the other entries.
-3. Config changes load automatically, so no restart is needed. Verify with `opencode plugin list`.
+Agents: expand **Instructions for agents** at the top of this README.
 
 ### From source
 
