@@ -310,10 +310,16 @@ export default Plugin.define({
           group: "GitHub",
           section: "prompt",
           slash: { name: kind.command, arguments: true },
-          enabled: !!ctx.sessions.current(),
           run: (input) => {
+            // Plugins get no session, directory or composer on the new-session screen, so there is nothing to attach to.
             const session = ctx.sessions.current()
-            if (!session) return
+            if (!session) {
+              ctx.toast.show({
+                title: `/${kind.command} needs a started session`,
+                description: "Send a first message, then run it again.",
+              })
+              return
+            }
             ctx.dialogs.open((dialog) => (
               <Search kind={id} directory={session.directory} initial={input ?? ""} dialog={dialog} />
             ))

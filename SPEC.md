@@ -84,3 +84,4 @@ The item's URL is the only context given to the model.
 - Desktop shows the state as GitHub's lists do: only the octicon, in GitHub's light or dark state colour (the label is its tooltip). The TUI shows the state as text in the same colours, picked by the theme's light or dark mode.
 - Desktop's dialog is `large`; the TUI's is `xlarge`, to fit the repo name.
 - The TUI shows as many rows as fit the terminal's height, up to 12; Desktop's list scrolls.
+- On Desktop's new-session screen, before the first message is sent, the commands only show a toast saying to send a message first. Plugins get no session, directory or composer there.

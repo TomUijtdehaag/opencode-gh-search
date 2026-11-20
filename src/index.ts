@@ -7,7 +7,11 @@ import { promisify } from "node:util"
 import { Plugin } from "@opencode/plugin"
 import { GhSearch, exactness, matches, matchRepos, parseQuery, type Cursor, type Item, type Kind, type Page, type Repo, type Resolved, type Viewer } from "./rpc.js"
 
-const run = promisify(execFile)
+const exec = promisify(execFile)
+// A hung git or gh (e.g. waiting on a credential prompt) would otherwise leave the dialog searching forever.
+const run = (file: string, args: string[], options: { cwd?: string; env: NodeJS.ProcessEnv }) =>
+  exec(file, args, { ...options, timeout: 10_000 })
+const REQUEST_MS = 30_000
 
 // The desktop app's server may not inherit the login shell's PATH.
 const env = {
@@ -113,6 +117,7 @@ async function request<T>(query: string, variables: Record<string, unknown>, att
     method: "POST",
     headers: { authorization: `bearer ${await githubToken()}`, "content-type": "application/json" },
     body: JSON.stringify({ query, variables }),
+    signal: AbortSignal.timeout(REQUEST_MS),
   })
   if (response.status === 401) token = undefined
   // Heavy pages can time out with a non-JSON 502/504 page; retry those a couple of times.
@@ -158,10 +163,11 @@ function viewer(): Promise<Viewer> {
   type Data = {
     viewer: { login: string; organizations: { nodes: { login: string; teams: { nodes: { slug: string }[] } }[] } }
   }
+  // Every search waits for this, so it skips the queue that index syncs fill on a cold start.
   const lookup = async (): Promise<Viewer> => {
-    const { login } = (await graphql<{ viewer: { login: string } }>("query { viewer { login } }")).viewer
+    const { login } = (await request<{ viewer: { login: string } }>("query { viewer { login } }", {})).viewer
     try {
-      const data = await graphql<Data>(
+      const data = await request<Data>(
         `query($login: String!) { viewer { login organizations(first: 100) { nodes { login
           teams(first: 100, userLogins: [$login]) { nodes { slug } } } } } }`,
         { login },
