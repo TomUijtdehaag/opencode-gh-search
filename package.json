@@ -29,7 +29,7 @@
     "vite": "^7.0.0",
     "vite-plugin-solid": "^2.11.0"
   },
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "OpenCode plugin: /pr and /issue live search for GitHub pull requests and issues across repos, attached as context",
   "license": "MIT",
   "author": "Tom Uijtdehaag",
